@@ -1,0 +1,57 @@
+# Summary
+minikube (v1.31.2), kubecli (v1.27.2), helm (v3.12.3)
+
+
+# how to configure 
+
+
+# how to deploy and run
+ - deploy docker desktop 
+ - Run minikube 
+   minikube start
+ - check minikube status confirm 
+   check minikube dashboard --url
+ - apply v1.yaml file 
+   kubectl apply -f v1.yaml
+ - verify pods
+   kubectl get pods
+ - when testing locally, expose port: 
+   kubectl expose deployment retry-node --type=LoadBalancer --port=8000 -n dev
+ 
+
+
+ - to view logs on seperate terminal/powershell: 
+   kubectl logs -f -l app=onna-data-collector
+
+# known issues 
+
+
+# Additional notes
+Alias
+kubectl = k
+
+Using minikube
+- create deployment: 
+k create deployment app-node --image=k8s.gcr.io/echoserver:1.4
+- create service for load balancer in default namespace:
+k expose deployment app-node --type=LoadBalancer --port=8000 -n default
+- using dev namespace, details on all events: 
+k get events -n dev
+- apply yaml file from app directory:
+k apply -f v1.yaml
+- confirm deployment:
+k get deployment
+- list of all logs in kubectl:
+k logs -f -l app=onna-data-collector
+
+
+local testing from root directory run: 
+curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+start service: 
+minikube service mywebapp
+
+# questions
+Does this script need to execute once deployed? Start/Stop option needed?
+
+Will logs need to be stored in a text file? 
+
