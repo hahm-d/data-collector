@@ -12,7 +12,7 @@
 
 # How to Configure
  Customize values within mychart/templates/values.yaml
-# List of configurable values: 
+## List of configurable values below: 
 * numResourceWorkers
 * apiEndpoint
 * xAuthToken
@@ -28,23 +28,17 @@
 # How to deploy and run 
  deploy docker desktop 
 1. Run minikube 
-``` minikube start 
-```
+``` minikube start ```
 2. check minikube status confirm 
-``` check minikube dashboard --url
-```
+``` check minikube dashboard --url```
 3. apply v1.yaml file 
-``` kubectl apply -f v1.yaml
-```
+``` kubectl apply -f v1.yaml```
 4. verify pods
-``` kubectl get pods 
-```
+``` kubectl get pods ```
 5. when testing locally, expose port: 
-``` kubectl expose deployment retry-node --type=LoadBalancer --port=8000 -n dev
-```
+``` kubectl expose deployment retry-node --type=LoadBalancer --port=8000 -n dev```
 6. to view logs on seperate terminal/powershell: 
-``` kubectl logs -f -l app=data-collector
-```
+``` kubectl logs -f -l app=data-collector```
 
 # Known Issues / Concerns 
 ## Within the script, attempting to make use of semaphore. Have not fully tested if threads on the semaphore does their work correctly.
