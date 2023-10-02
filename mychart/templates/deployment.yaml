@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mychart.fullname" . }}
+  labels:
+    {{- include "mychart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.resourceWorkers }}
+  selector:
+    matchLabels:
+      {{- include "mychart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mychart.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mychart.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: onna-data-collector
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env: 
+            - name: NUM_RESOURCE_WORKERS
+            value: "{{ .Values.resourceWorkers | default 4 }}"
+            - name: API_ENDPOINT
+            value: "{{ .Values.apiEndpoint }}"
+            - name: RESOURCE_ID_START
+            value: "{{ .Values.resourceIdStart | default 1 }}"
+            - name: RESOURCE_ID_END
+            value: "{{ .Values.resourceIdEnd | default 100 }}" 
+            - name: SECOND_API_ENDPOINT
+            value: "{{ .Values.secondApiEndpoint }}"
+            - name: THIRD_API_ENDPOINT
+            value: "{{ .Values.thirdApiEndpoint }}"
+            - name: X_AUTH_TOKEN
+            value: "{{ .Values.xAuthToken }}"
+            - name: SECOND_API_AUTH_TOKEN
+            value: "{{ .Values.secondApiAuthToken }}"
+            - name: THIRD_API_AUTH_TOKEN
+            value: "{{ .Values.thirdApiAuthToken }}"
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
