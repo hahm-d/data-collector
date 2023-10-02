@@ -51,9 +51,9 @@
 ``` k logs data-collector-app-###### ```
 
 # Known Issues / Concerns 
-# Within the script, attempting to make use of semaphore. Have not fully tested if threads on the semaphore does their work correctly. 
-# Assuming all sources have unique APIs and/or tokens. 
-# Clarification needed regarding each pod/worker tasks. After further research I assume the best method was to use redis to have the pods communicate and share tasks, where worker_num 1 (pod 1) only focuses on retries. Did not have time to fully implement this. 
+### Within the script, attempting to make use of semaphore. Have not fully tested if threads on the semaphore does their work correctly. 
+### Assuming all sources have unique APIs and/or tokens. 
+### Clarification needed regarding each pod/worker tasks. After further research I assume the best method was to use redis to have the pods communicate and share tasks, where worker_num 1 (pod 1) only focuses on retries. Did not have time to fully implement this. 
 
 # Personal Notes:
 ## Using minikube for testing
