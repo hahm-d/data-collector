@@ -26,30 +26,27 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: onna-data-collector
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: "onna-data-collector"
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
           env: 
             - name: NUM_RESOURCE_WORKERS
-            value: "{{ .Values.resourceWorkers | default 4 }}"
+              value: "{{ .Values.resourceWorkers | default 4 }}"
             - name: API_ENDPOINT
-            value: "{{ .Values.apiEndpoint }}"
+              value: "{{ .Values.apiEndpoint }}"
             - name: RESOURCE_ID_START
-            value: "{{ .Values.resourceIdStart | default 1 }}"
+              value: "{{ .Values.resourceIdStart | default 1 }}"
             - name: RESOURCE_ID_END
-            value: "{{ .Values.resourceIdEnd | default 100 }}" 
+              value: "{{ .Values.resourceIdEnd | default 100 }}" 
             - name: SECOND_API_ENDPOINT
-            value: "{{ .Values.secondApiEndpoint }}"
+              value: "{{ .Values.secondApiEndpoint }}"
             - name: THIRD_API_ENDPOINT
-            value: "{{ .Values.thirdApiEndpoint }}"
+              value: "{{ .Values.thirdApiEndpoint }}"
             - name: X_AUTH_TOKEN
-            value: "{{ .Values.xAuthToken }}"
+              value: "{{ .Values.xAuthToken }}"
             - name: SECOND_API_AUTH_TOKEN
-            value: "{{ .Values.secondApiAuthToken }}"
+              value: "{{ .Values.secondApiAuthToken }}"
             - name: THIRD_API_AUTH_TOKEN
-            value: "{{ .Values.thirdApiAuthToken }}"
+              value: "{{ .Values.thirdApiAuthToken }}"
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

@@ -2,13 +2,13 @@
 
 # IMPORTANT! Please update the values for correct endpoint below.
 resourceWorkers: 4 
-apiEndpoint: https://api-endpoint.com
+apiEndpoint: https://httpbin.org/messages # Source API
 xAuthToken: ""
 resourceIdStart: 1
 resourceIdEnd: 100
-secondApiEndpoint: https://2nd-api-endpoint.com
+secondApiEndpoint: https://httpbin.org/post # Processing API
 secondApiAuthToken: ""
-thirdApiEndpoint: https://3rd-api-endpoint.com 
+thirdApiEndpoint: https://httpbin.org/anything # Storing API
 thirdApiAuthToken: ""
 
 
@@ -20,13 +20,13 @@ tasks: # task-1 will be used for retrying for all GET requests
 
 image:
   repository: nginx
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: "data-collector-app"
+fullnameOverride: "data-collector-app"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -35,7 +35,7 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: "collectorapp"
 
 podAnnotations: {}
 
@@ -51,7 +51,7 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: ClusterIP
+  type: NodePort
   port: 80
 
 ingress:

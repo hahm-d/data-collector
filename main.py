@@ -37,16 +37,11 @@ async def fetch_resource(session, resource_id, retry_count=0):
         else:
             error_message = await response.text()
             print(f"Failed to collect resource {resource_id}, Response Code: {response.status}, Error Message: {error_message}")
+            # send the failed session to retry_queue
+            await retry_queue.put(("fetch", API_ENDPOINT, AUTH_TOKEN, resource_id, retry_count + 1), 0)
 
-            if retry_count < MAX_RETRY_ATTEMPTS:
-                # Retry the resource with an increased retry count
-                print(f"Retrying ({retry_count + 1}/{MAX_RETRY_ATTEMPTS}) for resource {resource_id}")
-                return await fetch_resource(session, resource_id, retry_count + 1)
-
-            print(f"Maximum retry attempts reached for resource {resource_id}")
-            # Return None when maximum retry attempts reached
             return None
-
+        
 # Post data to the Processing or Storing API asynchronously and return JSON data
 async def post_resource(session, api_endpoint, auth_token, data_to_post, retry_count=0):
     url = f"{api_endpoint}"
@@ -55,17 +50,13 @@ async def post_resource(session, api_endpoint, auth_token, data_to_post, retry_c
     async with session.post(url, headers=headers, json=data_to_post) as response:
         if response.status == 201:
             print(f"Posted resource successfully: {data_to_post}")
+            data = await response.json()
+            return data
         else:
             error_message = await response.text()
             print(f"Failed to post resource: {data_to_post}, Response Code: {response.status}, Error Message: {error_message}")
-
-            if retry_count < MAX_RETRY_ATTEMPTS:
-                # Retry posting the resource with an increased retry count
-                print(f"Retrying ({retry_count + 1}/{MAX_RETRY_ATTEMPTS}) for resource: {data_to_post}")
-                return await post_resource(session, api_endpoint, auth_token, data_to_post, retry_count + 1)
-
-            print(f"Maximum retry attempts reached for resource: {data_to_post}")
-            # Return None when maximum retry attempts reached
+            # send the failed session to retry_queue
+            await retry_queue.put(("post", api_endpoint, auth_token, data_to_post, retry_count + 1), 0)
             return None
 
 # Function to retry failed resources asynchronously by Worker 1
@@ -76,7 +67,8 @@ async def retry_failed_resources(session):
             break  # Exit the loop when None is encountered in the queue
 
         resource_type, api_endpoint, auth_token, resource_data, retry_count = item
-
+        
+        # Did not fully implement worker logic for WORKER_NUM == 1 (see README)
         if retry_count <= MAX_RETRY_ATTEMPTS:
             if resource_type == "fetch":
                 await fetch_resource(session, resource_data, retry_count)
@@ -102,13 +94,13 @@ async def collect_data():
             async with semaphore:
                 response_task = asyncio.create_task(fetch_resource(session, resource_id))
                 tasks.append(response_task)
-                data = await response_task
-                if data:
-                    post_task = asyncio.create_task(post_resource(session, SECOND_API_ENDPOINT,SECOND_API_AUTH_TOKEN, data))
+                fetch_data = await response_task
+                if fetch_data:
+                    post_task = asyncio.create_task(post_resource(session, SECOND_API_ENDPOINT,SECOND_API_AUTH_TOKEN, fetch_data))
                     tasks.append(post_task)
-
                     # If the post to the Processing API was successful, send the data to the Storage API
-                    if post_task and post_task.result() and post_task.result().status == 201:
+                    # May fail if post reponse does not include processing_date. Based on tech pdf.
+                    if post_task and post_task.processing_date:
                         post_data = await post_task.result().json()
                         await post_resource(session, THIRD_API_AUTH_TOKEN, THIRD_API_ENDPOINT, post_data)
 
