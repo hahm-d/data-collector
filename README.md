@@ -4,7 +4,7 @@
  This script is an example data collection engine that collects resources from a source API. A resource is defined as an individual record retrieved from the Source API.
  Once the resource is successfully called, it then sends the resource to the Processing API. Furthermore, Once a successful 201 response is recieved, it is then send to the Storage API.
  This script supports concurrent data collection using workers. This script was deployed using the following tools/versions
- Tested on the following setup: minikube (v1.31.2), kubecli (v1.27.2), helm (v3.12.3)
+ Tested on the following setup: docker (24.0.4), minikube (v1.31.2), kubecli (v1.27.2), helm (v3.12.3)
  requirements.txt includes aiohttp (https://pypi.org/project/aiohttp/)
 
 # Pre-requisites 
@@ -43,8 +43,7 @@
 ``` kubectl logs -f -l app=data-collector```
 
 # Known Issues / Concerns 
-# Within the script, attempting to make use of semaphore. Have not fully tested if threads on the semaphore does their work correctly.
-
+# Within the script, attempting to make use of semaphore. Have not fully tested if threads on the semaphore does their work correctly. Wanted to make use of queue and check if queues are full (max active workers), before resuming new tasks.
 # Assuming all three APIs systems will require unique tokens. I should have asked for more clarification on this. 
 
 # Minikube notes
