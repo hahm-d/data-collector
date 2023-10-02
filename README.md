@@ -1,4 +1,6 @@
-#  Overview 
+# Data Collector
+
+# Overview 
  This script is an example data collection engine that collects resources from a source API. A resource is defined as an individual record retrieved from the Source API.
  Once the resource is successfully called, it then sends the resource to the Processing API. Furthermore, Once a successful 201 response is recieved, it is then send to the Storage API.
  This script supports concurrent data collection using workers. This script was deployed using the following tools/versions
@@ -41,13 +43,12 @@
 ``` kubectl logs -f -l app=data-collector```
 
 # Known Issues / Concerns 
-## Within the script, attempting to make use of semaphore. Have not fully tested if threads on the semaphore does their work correctly.
+# Within the script, attempting to make use of semaphore. Have not fully tested if threads on the semaphore does their work correctly.
 
-## Assuming all three APIs systems will require unique tokens. I should have asked for more clarification on this. 
+# Assuming all three APIs systems will require unique tokens. I should have asked for more clarification on this. 
 
 # Minikube notes
-### Alias
-### kubectl = k
+* Alias: kubectl = k
 
 ## Using minikube for testing
  - start minikube:
@@ -66,7 +67,7 @@
 ``` k logs -f -l app=data-collector ```
 
 
-# local testing from root directory run: 
+## local testing from root directory run: 
 ``` curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" ```
  start service: 
 ``` minikube service app-name ```
